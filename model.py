@@ -20,10 +20,31 @@ class LSTM(nn.Module):
         
     def forward(self, x):
         """
-        shape of x: (T, N, C) if 'batch_first=True' else (N, T, C)  
-        T: seq_len, N: batch_size, C: input_size
+        shape of x: (N, T, C)  N: batch_size, T: seq_len(time), C: input_size(channel)
         """
-        lstm_out, _ = self.lstm(x, None)
+        lstm_out, (h, c) = self.lstm(x, None)
+        # x = self.bn(lstm_out)
+        x = self.hidden2tag(lstm_out[:, -1, :])
+        x = F.sigmoid(x)
+        return x
+
+
+class LSTM_CNN(nn.Module):
+    def __init__(self, input_size, hidden_size, num_layers):
+        super(LSTM, self).__init__()
+
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
+        
+        self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
+        # self.bn = nn.BatchNorm2d(hidden_size)
+        self.hidden2tag = nn.Linear(hidden_size, 1)
+        
+    def forward(self, x):
+        """
+        shape of x: (N, T, C)  N: batch_size, T: seq_len(time), C: input_size(channe)
+        """
+        lstm_out, (h, c) = self.lstm(x, None)
         # x = self.bn(lstm_out)
         x = self.hidden2tag(lstm_out[:, -1, :])
         x = F.sigmoid(x)
