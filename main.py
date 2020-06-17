@@ -37,7 +37,7 @@ def main():
     # model initiation
     model = LSTM(input_size=64, hidden_size=256, num_layers=2)
     model = model.to(DEVICE)
-    criterion = nn.BCELoss()
+    criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters())
 
     train(model, criterion, optimizer, train_loader, DEVICE, train_num=train_num, epochs=epochs)
