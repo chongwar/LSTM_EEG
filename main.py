@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 from load_data import load_group_eeg_data, load_combined_eeg_data
 from make_dataset import MyDataset
-from model import LSTM
+from model import LSTM, LSTM_CNN
 from torch.utils.data import DataLoader
 from train_test import train, test
 
@@ -25,7 +25,7 @@ def main():
     # load data from '.npy' file
     # x_train, x_test, y_train, y_test = load_group_eeg_data(date, group, shuffle=shuffle, sorted_=sorted_)
     x_train, x_test, y_train, y_test = load_combined_eeg_data(date, shuffle=shuffle, sorted_=sorted_)
-    
+    # x: (N, C, T)  N: trials  C: channels  T: times 
     train_num, test_num = x_train.shape[0], x_test.shape[0]
     
     # make dataset for train and test
@@ -35,7 +35,8 @@ def main():
     test_loader = DataLoader(test_data, batch_size=batch_size, drop_last=True)
 
     # model initiation
-    model = LSTM(input_size=64, hidden_size=256, num_layers=2)
+    # model = LSTM(2, input_size=64, hidden_size=256, num_layers=2)
+    model = LSTM_CNN(2, x_train.shape[1], 16, 32, 2)
     model = model.to(DEVICE)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters())
