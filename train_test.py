@@ -16,7 +16,8 @@ def train(model, criterion, optimizer, data_loader, device, train_num, epochs=20
             
             y_pred = model(x)
             _, pred = torch.max(y_pred, 1)
-            correct_num += np.sum(pred.cpu().numpy() == y.cpu().numpy())
+            correct_num += np.sum(pred.numpy() == y.numpy())
+            # correct_num += np.sum(pred.cpu().numpy() == y.cpu().numpy())
             
             loss = criterion(y_pred, y)
             optimizer.zero_grad()
@@ -44,7 +45,8 @@ def test(model, criterion, data_loader, device, test_num):
         
         y_pred = model(x)
         _, pred = torch.max(y_pred, 1)
-        correct_num += np.sum(pred.cpu().numpy() == y.cpu().numpy())
+        correct_num += np.sum(pred.numpy() == y.numpy())
+        # correct_num += np.sum(pred.cpu().numpy() == y.cpu().numpy())
         
         loss = criterion(y_pred, y)
         running_loss += float(loss.item())

@@ -33,7 +33,7 @@ class LSTM_CNN(nn.Module):
     def __init__(self, num_classes, channels, input_size, hidden_size, num_layers):
         super(LSTM_CNN, self).__init__()
 
-        drop_out = 0.25
+        drop_out = 0.5
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.num_layers = num_layers
@@ -76,9 +76,4 @@ class LSTM_CNN(nn.Module):
         
 
 if __name__ == '__main__':
-    model = LSTM(input_size=64, hidden_size=256, num_layers=2)
-    # x = torch.randn((512, 4, 64))
-    x = torch.randn((4, 512, 64))
-    with torch.no_grad():
-        y = model(x)
-        print(y.numpy().reshape(-1))
+    pass
