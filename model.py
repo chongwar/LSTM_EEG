@@ -30,7 +30,8 @@ class LSTM(nn.Module):
 
 
 class LSTM_CNN(nn.Module):
-    def __init__(self, num_classes, channels, input_size, hidden_size, num_layers):
+    def __init__(self, num_classes, channels, input_size, hidden_size, num_layers, 
+                 time_kernel_size=16, spatial_num=8, drop_out=0.5):
         super(LSTM_CNN, self).__init__()
 
         drop_out = 0.5
@@ -40,22 +41,23 @@ class LSTM_CNN(nn.Module):
         
         self.lstm = nn.LSTM(self.input_size, self.hidden_size, self.num_layers, batch_first=True)
         
-        self.block_1 = nn.Sequential(
-            nn.ZeroPad2d((self.hidden_size // 2 - 1, self.hidden_size // 2, 0, 0)),
-            nn.Conv2d(1, 8, (1, self.hidden_size), bias=False),
-            nn.BatchNorm2d(8),
-            nn.ELU(),
-            nn.AvgPool2d((1, 4))
-        )
+        # self.block_1 = nn.Sequential(
+        #     nn.ZeroPad2d((time_kernel_size // 2 - 1, time_kernel_size // 2, 0, 0)),
+        #     nn.Conv2d(1, 8, (1, time_kernel_size), bias=False),
+        #     nn.BatchNorm2d(8),
+        #     nn.ELU(),
+        #     nn.AvgPool2d((1, 4))
+        # )
         
         self.block_2 = nn.Sequential(
-            nn.Conv2d(8, 8, (channels, 1), bias=False),
-            nn.BatchNorm2d(8),
+            nn.Conv2d(1, spatial_num, (channels, 1), bias=False),
+            nn.BatchNorm2d(spatial_num),
             nn.ELU(),
+            nn.AvgPool2d((1, 4)),
             nn.Dropout(drop_out)
         )
         
-        self.fc = nn.Linear(8 * self.hidden_size // 4, num_classes)
+        self.fc = nn.Linear(spatial_num * self.hidden_size // 4, num_classes)
         
     def forward(self, x):
         # x: (N, C, T)  N: batch_size; C: channels; T: times
@@ -66,7 +68,7 @@ class LSTM_CNN(nn.Module):
         # x: (N, 1, C, H)  H: hidden_size
         x = lstm_out[:, -1, :].reshape(N, 1, C, self.hidden_size)
         
-        x = self.block_1(x)
+        # x = self.block_1(x)
         x = self.block_2(x)
         
         x = x.view(x.size(0), -1)

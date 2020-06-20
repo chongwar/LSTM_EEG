@@ -31,7 +31,7 @@ def load_group_eeg_data(date, group, shuffle=True, sorted_=True):
     x = x[:, index, :]
     
     # train-test shuffle split
-    sss = StratifiedShuffleSplit(n_splits=1, test_size=0.25, random_state=1)
+    sss = StratifiedShuffleSplit(n_splits=1, test_size=0.25)
     for train_index, test_index in sss.split(x, y):
         x_train, x_test = x[train_index], x[test_index]
         y_train, y_test = y[train_index], y[test_index]
@@ -86,7 +86,6 @@ def load_combined_eeg_data(date, sorted_=True):
 if __name__ == '__main__':
     date = '06_03'
     group = 1
-    shuffle = True
     sorted_ = True
-    # x_train, x_test, y_train, y_test = load_group_eeg_data(date, group, shuffle=shuffle, sorted_=sorted_)
-    x_train, x_test, y_train, y_test = load_combined_eeg_data(date, shuffle=shuffle, sorted_=sorted_)
+    # x_train, x_test, y_train, y_test = load_group_eeg_data(date, group, sorted_=sorted_)
+    x_train, x_test, y_train, y_test = load_combined_eeg_data(date, sorted_=sorted_)
