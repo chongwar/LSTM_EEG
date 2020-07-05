@@ -63,7 +63,7 @@ def load_combined_eeg_data(date, sorted_=True):
     y = y.reshape(-1)
     # transpose and downsample (N, C, T) ===> (N, T/2, C)
     x = np.transpose(x, (0, 2, 1))
-    index = np.arange(0, x.shape[1], 2)
+    index = np.arange(0, x.shape[1], 4)
     x = x[:, index, :]
 
     # train-test shuffle split
@@ -77,6 +77,8 @@ def load_combined_eeg_data(date, sorted_=True):
     scale_data(x_test)
     x_train = np.transpose(x_train, (0, 2, 1))
     x_test = np.transpose(x_test, (0, 2, 1))
+    x_train = x_train.reshape(x_train.shape[0], 1, x_train.shape[1], x_train.shape[2])
+    x_test = x_test.reshape(x_test.shape[0], 1, x_test.shape[1], x_test.shape[2])
     print(f'Processed EEG train data shape: {x_train.shape}')
     print(f'Processed EEG test  data shape: {x_test.shape}')
 

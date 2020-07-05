@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 from load_data import load_group_eeg_data, load_combined_eeg_data
 from make_dataset import MyDataset
-from model import LSTM, LSTM_CNN
+from model import LSTM, LSTM_CNN, LSTM_CNN_Half, LSTM_CNN_Spatial
 from torch.utils.data import DataLoader
 from train_test import train, test
 
@@ -15,8 +15,6 @@ def main(epochs, batch_size, input_size, hidden_size, num_layers, spatial_num, d
     DEVICE = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     print('DEVICE: ', DEVICE)
 
-    # epochs = 60
-    # batch_size = 8
     date = '06_03'
     group = 1
     sorted_ = True
@@ -36,8 +34,18 @@ def main(epochs, batch_size, input_size, hidden_size, num_layers, spatial_num, d
 
     # model initiation
     # model = LSTM(num_classes=2, input_size=64, hidden_size=256, num_layers=2)
-    model = LSTM_CNN(num_classes=2, channels=x_train.shape[1], input_size=input_size, hidden_size=hidden_size, 
-                     num_layers=num_layers, spatial_num=spatial_num, drop_out=drop_out)
+    
+    # model = LSTM_CNN(num_classes=2, channels=x_train.shape[1], input_size=input_size, hidden_size=hidden_size, 
+    #                  num_layers=num_layers, spatial_num=spatial_num, drop_out=drop_out)
+    
+    # model = LSTM_CNN_Half(num_classes=2, batch_size=batch_size, T=x_train.shape[-1],
+    #                       C=x_train.shape[-2], input_size=input_size, hidden_size=hidden_size,
+    #                       num_layers=num_layers, spatial_num=spatial_num)
+    
+    model = LSTM_CNN_Spatial(num_classes=2, batch_size=batch_size, T=x_train.shape[-1],
+                          C=x_train.shape[-2], input_size=input_size, hidden_size=hidden_size,
+                          num_layers=num_layers, spatial_num=spatial_num)
+    
     model = model.to(DEVICE)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters())
@@ -84,12 +92,12 @@ if __name__ == '__main__':
       30       16           16          32            4          16         0.25
       30       16           16          32            4          16         0.5
     """                                
-    epochs = 30
+    epochs = 200
     batch_size = 16
     input_size = 16
-    hidden_size = 32
+    hidden_size = 16
     num_layers = 4
-    spatial_num = 16
+    spatial_num = 8
     drop_out = 0.5
     logged = False
     main(epochs, batch_size, input_size, hidden_size, num_layers, spatial_num, drop_out, logged)
